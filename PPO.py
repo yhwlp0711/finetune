@@ -1,3 +1,4 @@
+import os
 import random
 from dataclasses import dataclass
 from typing import Optional, Union
@@ -7,8 +8,9 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from transformers import AutoModelForCausalLM, AutoModelForSequenceClassification, AutoTokenizer
+from modelscope import AutoModelForCausalLM, AutoModelForSequenceClassification, AutoTokenizer
 
+os.environ["MODELSCOPE_CACHE"] = "./models/"
 
 # 构建dataset
 class PromptDataset(Dataset):
@@ -418,16 +420,16 @@ if __name__ == "__main__":
     # 实际训练的batch_size大小，一次取多少条数据用于更新参数
     micro_train_batch_size = 2
     # 记录日志
-    writer = SummaryWriter('./runs')
+    writer = SummaryWriter('./logs')
     # 策略模型
-    actor_model = AutoModelForCausalLM.from_pretrained('/home/user/Downloads/Qwen2.5-0.5B-Instruct').to(device)
+    actor_model = AutoModelForCausalLM.from_pretrained('Qwen2.5-0.5B-Instruct').to(device)
     # 参考模型
-    ref_model = AutoModelForCausalLM.from_pretrained('/home/user/Downloads/Qwen2.5-0.5B-Instruct').to(device)
+    ref_model = AutoModelForCausalLM.from_pretrained('Qwen2.5-0.5B-Instruct').to(device)
     # 奖励模型
     reward_model = AutoModelForSequenceClassification.from_pretrained(
-        '/home/user/Downloads/reward-model-deberta-v3-large-v2').to(device)
-    actor_tokenizer = AutoTokenizer.from_pretrained('/home/user/Downloads/Qwen2.5-0.5B-Instruct')
-    reward_tokenizer = AutoTokenizer.from_pretrained('/home/user/Downloads/reward-model-deberta-v3-large-v2')
+        'reward-model-deberta-v3-large-v2').to(device)
+    actor_tokenizer = AutoTokenizer.from_pretrained('Qwen2.5-0.5B-Instruct')
+    reward_tokenizer = AutoTokenizer.from_pretrained('reward-model-deberta-v3-large-v2')
     # 价值模型
     critic_model = Critic(actor_model.base_model).to(device)
 
