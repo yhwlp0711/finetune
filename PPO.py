@@ -8,9 +8,13 @@ import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from torch.utils.tensorboard import SummaryWriter
-from modelscope import AutoModelForCausalLM, AutoModelForSequenceClassification, AutoTokenizer
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+os.environ["TRANSFORMERS_CACHE"] = "./hfmodels/"
+os.environ["HF_HOME"] = "./hfmodels/"
+from transformers import AutoModelForCausalLM, AutoModelForSequenceClassification, AutoTokenizer
 
 os.environ["MODELSCOPE_CACHE"] = "./models/"
+
 
 # 构建dataset
 class PromptDataset(Dataset):
@@ -422,14 +426,14 @@ if __name__ == "__main__":
     # 记录日志
     writer = SummaryWriter('./logs')
     # 策略模型
-    actor_model = AutoModelForCausalLM.from_pretrained('Qwen2.5-0.5B-Instruct').to(device)
+    actor_model = AutoModelForCausalLM.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct').to(device)
     # 参考模型
-    ref_model = AutoModelForCausalLM.from_pretrained('Qwen2.5-0.5B-Instruct').to(device)
+    ref_model = AutoModelForCausalLM.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct').to(device)
     # 奖励模型
     reward_model = AutoModelForSequenceClassification.from_pretrained(
-        'reward-model-deberta-v3-large-v2').to(device)
-    actor_tokenizer = AutoTokenizer.from_pretrained('Qwen2.5-0.5B-Instruct')
-    reward_tokenizer = AutoTokenizer.from_pretrained('reward-model-deberta-v3-large-v2')
+        'OpenAssistant/reward-model-deberta-v3-large-v2').to(device)
+    actor_tokenizer = AutoTokenizer.from_pretrained('Qwen/Qwen2.5-0.5B-Instruct')
+    reward_tokenizer = AutoTokenizer.from_pretrained('OpenAssistant/reward-model-deberta-v3-large-v2')
     # 价值模型
     critic_model = Critic(actor_model.base_model).to(device)
 
